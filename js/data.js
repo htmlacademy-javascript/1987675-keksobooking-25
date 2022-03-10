@@ -32,24 +32,24 @@ const OFFERS_COUNT = 10;
 const getRandomFeatures = () => {
   const randomFeatures = [];
   for (let i = 0; i < getRandomInteger(1, FEATURES.length); i++) {
-    const randomIndex = getRandomInteger(1, FEATURES.length - 1);
+    const randomIndex = getRandomInteger(0, FEATURES.length - 1);
     if (!randomFeatures.includes(FEATURES[randomIndex])) {
       randomFeatures.push(FEATURES[randomIndex]);
     }
   }
-  return (randomFeatures);
+  return randomFeatures;
 };
 
 const getRandomPhotos = () => {
   const randomPhoto = [];
   while (randomPhoto.length < getRandomInteger(0, 10)) {
-    randomPhoto.push(PHOTOS[getRandomInteger(1, PHOTOS.length - 1)]);
+    randomPhoto.push(PHOTOS[getRandomInteger(0, PHOTOS.length - 1)]);
   }
   return randomPhoto;
 };
 
-const createOffer = (_element, index) => {
-  const avatarImgIndex = index+1 < 10 ? `0${index+1}` : index+1;
+const createOffer = (_element, offerIndex) => {
+  const avatarImgIndex = offerIndex+1 < 10 ? `0${offerIndex+1}` : offerIndex+1;
   const lat = getRandomFloat(35.65000, 35.70000, 5);
   const lng = getRandomFloat(139.70000, 139.80000, 5);
   return {
@@ -57,7 +57,7 @@ const createOffer = (_element, index) => {
       avatar: `img/avatars/user${avatarImgIndex}.png`,
     },
     offer: {
-      title: `Обьявление №${index+1}`,
+      title: `Обьявление №${offerIndex+1}`,
       address: `${lat}, ${lng}`,
       price: getRandomInteger(0, 1000),
       type: getRandomArrayElement(PROPERTY_TYPES),
@@ -66,7 +66,7 @@ const createOffer = (_element, index) => {
       checkin: getRandomArrayElement(CHECK_IN_TIME),
       checkout: getRandomArrayElement(CHECK_IN_TIME),
       features: getRandomFeatures(),
-      description: `Описание помещения ${index+1}`,
+      description: `Описание помещения ${offerIndex+1}`,
       photos: getRandomPhotos(),
     },
     location: {
