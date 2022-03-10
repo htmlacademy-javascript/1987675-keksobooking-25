@@ -1,17 +1,9 @@
-import {createOffers} from './data.js';
+import {createOffers, OFFER_TYPES} from './data.js';
 
 const similarOffers = createOffers();
 const cardTemplate = document.querySelector('#card').content;
 const mapCanvas = document.querySelector('#map-canvas');
 const offerElements = [];
-
-const OfferType = {
-  palace: 'Дворец',
-  flat: 'Квартира',
-  house: 'Дом',
-  bungalow: 'Бунгало',
-  hotel: 'Отель',
-};
 
 similarOffers.forEach((offer) => {
   const offerElement = cardTemplate.cloneNode(true);
@@ -19,7 +11,7 @@ similarOffers.forEach((offer) => {
   offerElement.querySelector('.popup__title').textContent = offer.offer.title;
   offerElement.querySelector('.popup__text--address').textContent = offer.offer.address;
   offerElement.querySelector('.popup__text--price').textContent = `${offer.offer.price} ₽/ночь`;
-  offerElement.querySelector('.popup__type').textContent = OfferType[offer.offer.type]; //!!!
+  offerElement.querySelector('.popup__type').textContent = OFFER_TYPES[offer.offer.type]; //!!!
   offerElement.querySelector('.popup__text--capacity').textContent = `${offer.offer.rooms} комнаты для ${offer.offer.guests} гостей`;
   offerElement.querySelector('.popup__text--time').textContent = `Заезд после ${offer.offer.checkin}, выезд до ${offer.offer.checkout}`;
   offerElement.querySelector('.popup__features').innerHTML = '';

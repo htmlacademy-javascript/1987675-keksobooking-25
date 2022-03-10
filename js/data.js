@@ -15,18 +15,23 @@ const CHECK_IN_TIME = [
   '13:00',
   '14:00',
 ];
-const PROPERTY_TYPES = [
-  'palace',
-  'flat',
-  'house',
-  'bungalow',
-  'hotel',
-];
+const OFFER_TYPES = {
+  palace: 'Дворец',
+  flat: 'Квартира',
+  house: 'Дом',
+  bungalow: 'Бунгало',
+  hotel: 'Отель',
+};
+const PROPERTY_TYPES = Object.keys(OFFER_TYPES);
 const PHOTOS = [
   'https://assets.htmlacademy.ru/content/intensive/javascript-1/keksobooking/duonguyen-8LrGtIxxa4w.jpg',
   'https://assets.htmlacademy.ru/content/intensive/javascript-1/keksobooking/brandon-hoogenboom-SNxQGWxZQi0.jpg',
   'https://assets.htmlacademy.ru/content/intensive/javascript-1/keksobooking/claire-rendall-b6kAwr1i0Iw.jpg',
 ];
+const LATITUDE_MIN = 35.65000;
+const LATITUDE_MAX = 35.70000;
+const LONGITUDE_MIN = 139.70000;
+const LONGITUDE_MAX = 139.80000;
 const OFFERS_COUNT = 10;
 
 const getRandomFeatures = () => {
@@ -50,8 +55,8 @@ const getRandomPhotos = () => {
 
 const createOffer = (_element, offerIndex) => {
   const avatarImgIndex = offerIndex+1 < 10 ? `0${offerIndex+1}` : offerIndex+1;
-  const lat = getRandomFloat(35.65000, 35.70000, 5);
-  const lng = getRandomFloat(139.70000, 139.80000, 5);
+  const lat = getRandomFloat(LATITUDE_MIN, LATITUDE_MAX, 5);
+  const lng = getRandomFloat(LONGITUDE_MIN, LONGITUDE_MAX, 5);
   return {
     author: {
       avatar: `img/avatars/user${avatarImgIndex}.png`,
@@ -80,4 +85,4 @@ const createOffers = () => {
   return Array.from({length: OFFERS_COUNT}, createOffer);
 };
 
-export {createOffers};
+export {createOffers, OFFER_TYPES};
