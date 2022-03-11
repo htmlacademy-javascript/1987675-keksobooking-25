@@ -1,2 +1,4 @@
 /* eslint-disable no-console */
-import './markup-generate.js';
+import {generateMarkup} from './markup-generate.js';
+
+generateMarkup();
