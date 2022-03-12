@@ -1,4 +1,4 @@
 /* eslint-disable no-console */
-import {createOffers} from './data.js';
+import {generateMarkup} from './markup-generate.js';
 
-console.log(createOffers());
+generateMarkup();
