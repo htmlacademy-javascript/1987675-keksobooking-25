@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import {generateMarkup} from './markup-generate.js';
-import './form.js';
+import {setFormActivity} from './form.js';
 
 generateMarkup();
+setFormActivity(true);
