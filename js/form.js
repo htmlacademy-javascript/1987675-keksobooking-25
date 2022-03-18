@@ -55,16 +55,16 @@ const typeOption = {
   'palace': '10000',
 };
 
-const onPriceChange = () => {
+const onTypeChange = () => {
   priceField.min = typeOption[typeField.value];
   priceField.placeholder = typeOption[typeField.value];
   pristine.validate(priceField);
 };
 
-typeField.addEventListener('change', onPriceChange);
+typeField.addEventListener('change', onTypeChange);
 
 const validatePrice = () => {
-  return priceField.value >= +priceField.min;
+  return priceField.value >= +typeOption[typeField.value];
 };
 
 const getPriceErrorMessage = () => {
