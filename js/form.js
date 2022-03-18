@@ -1,8 +1,7 @@
 /* eslint-disable arrow-body-style */
 /* eslint-disable no-alert */
 const offerForm = document.querySelector('.ad-form');
-const roomNumberField = offerForm.querySelector('#room_number');
-const capacityField = offerForm.querySelector('#capacity');
+
 
 const pristine = new Pristine(offerForm, {
   classTo: 'ad-form__element',
@@ -12,6 +11,10 @@ const pristine = new Pristine(offerForm, {
   errorTextTag: 'div',
   errorTextClass: 'ad-form__error',
 });
+
+
+const roomNumberField = offerForm.querySelector('#room_number');
+const capacityField = offerForm.querySelector('#capacity');
 
 const roomNumberOption = {
   '1': '1',
@@ -32,8 +35,14 @@ const getCapacityErrorMessage = () => {
   `;
 };
 
-pristine.addValidator(roomNumberField, validateCapacity);
 pristine.addValidator(capacityField, validateCapacity, getCapacityErrorMessage);
+
+const onRoomNumberChange = () => {
+  pristine.validate(capacityField);
+};
+
+roomNumberField.addEventListener('change', onRoomNumberChange);
+
 
 const typeField = offerForm.querySelector('#type');
 const priceField = offerForm.querySelector('#price');
@@ -46,15 +55,16 @@ const typeOption = {
   'palace': '10000',
 };
 
-const validateType = () => {
-  priceField.setAttribute('min', typeOption[typeField.value]);
-  priceField.setAttribute('placeholder', typeOption[typeField.value]);
+const onPriceChange = () => {
+  priceField.min = typeOption[typeField.value];
+  priceField.placeholder = typeOption[typeField.value];
+  pristine.validate(priceField);
 };
 
-typeField.addEventListener('change', validateType);
+typeField.addEventListener('change', onPriceChange);
 
 const validatePrice = () => {
-  return priceField.value >= +priceField.getAttribute('min');
+  return priceField.value >= +priceField.min;
 };
 
 const getPriceErrorMessage = () => {
@@ -62,6 +72,22 @@ const getPriceErrorMessage = () => {
 };
 
 pristine.addValidator(priceField, validatePrice, getPriceErrorMessage);
+
+
+const timeInField = offerForm.querySelector('#timein');
+const timeOutField = offerForm.querySelector('#timeout');
+
+const onTimeInChange = () => {
+  timeOutField.value = timeInField.value;
+};
+
+const onTimeOutChange = () => {
+  timeInField.value = timeOutField.value;
+};
+
+timeInField.addEventListener('change', onTimeInChange);
+timeOutField.addEventListener('change', onTimeOutChange);
+
 
 offerForm.addEventListener('submit', (evt) => {
   const isValid = pristine.validate();
@@ -71,17 +97,7 @@ offerForm.addEventListener('submit', (evt) => {
   }
 });
 
-//--------------------
-// «Тип жилья» — выбор опции меняет атрибуты минимального значения и плейсхолдера поля «Цена за ночь».
-// На основе атрибута с минимальным значением должна отрабатывать валидация поля «Цена за ночь».
 
-// Поле «Тип жилья» влияет на минимальное значение поля «Цена за ночь»:
-// «Бунгало» — минимальная цена за ночь 0;
-// «Квартира» — минимальная цена за ночь 1 000;
-// «Отель» — минимальная цена за ночь 3 000;
-// «Дом» — минимальная цена 5 000;
-// «Дворец» — минимальная цена 10 000.
-//-----------------------------------------------------------------------------------------------------------------------------
 const setFormActivity = (status) => {
   const adForm = document.querySelector('.ad-form');
   const adFormFieldsets = adForm.querySelectorAll('fieldset');
