@@ -1,8 +1,7 @@
 /* eslint-disable arrow-body-style */
 /* eslint-disable no-alert */
 const offerForm = document.querySelector('.ad-form');
-const roomNumberField = offerForm.querySelector('#room_number');
-const capacityField = offerForm.querySelector('#capacity');
+
 
 const pristine = new Pristine(offerForm, {
   classTo: 'ad-form__element',
@@ -13,6 +12,10 @@ const pristine = new Pristine(offerForm, {
   errorTextClass: 'ad-form__error',
 });
 
+
+const roomNumberField = offerForm.querySelector('#room_number');
+const capacityField = offerForm.querySelector('#capacity');
+
 const roomNumberOption = {
   '1': '1',
   '2': ['1', '2'],
@@ -20,11 +23,11 @@ const roomNumberOption = {
   '100': '0',
 };
 
-const validateRoomNumber = () => {
+const validateCapacity = () => {
   return roomNumberOption[roomNumberField.value].includes(capacityField.value);
 };
 
-const getRoomNumberErrorMessage = () => {
+const getCapacityErrorMessage = () => {
   return `
     ${roomNumberField.options[roomNumberField.selectedIndex].textContent}
     не подходит
@@ -32,8 +35,14 @@ const getRoomNumberErrorMessage = () => {
   `;
 };
 
-pristine.addValidator(roomNumberField, validateRoomNumber);
-pristine.addValidator(capacityField, validateRoomNumber, getRoomNumberErrorMessage);
+pristine.addValidator(capacityField, validateCapacity, getCapacityErrorMessage);
+
+const onRoomNumberChange = () => {
+  pristine.validate(capacityField);
+};
+
+roomNumberField.addEventListener('change', onRoomNumberChange);
+
 
 offerForm.addEventListener('submit', (evt) => {
   const isValid = pristine.validate();
@@ -42,6 +51,7 @@ offerForm.addEventListener('submit', (evt) => {
     alert('Обязательные поля не заполнены');
   }
 });
+
 
 const setFormActivity = (status) => {
   const adForm = document.querySelector('.ad-form');
