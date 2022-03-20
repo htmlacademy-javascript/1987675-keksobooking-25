@@ -44,6 +44,51 @@ const onRoomNumberChange = () => {
 roomNumberField.addEventListener('change', onRoomNumberChange);
 
 
+const typeField = offerForm.querySelector('#type');
+const priceField = offerForm.querySelector('#price');
+
+const typeOption = {
+  'bungalow': '0',
+  'flat': '1000',
+  'hotel': '3000',
+  'house': '5000',
+  'palace': '10000',
+};
+
+const onTypeChange = () => {
+  priceField.min = typeOption[typeField.value];
+  priceField.placeholder = typeOption[typeField.value];
+  pristine.validate(priceField);
+};
+
+typeField.addEventListener('change', onTypeChange);
+
+const validatePrice = () => {
+  return priceField.value >= +typeOption[typeField.value];
+};
+
+const getPriceErrorMessage = () => {
+  return `Минимальная цена для выбранного типа жилья ${typeOption[typeField.value]} ₽/ночь`;
+};
+
+pristine.addValidator(priceField, validatePrice, getPriceErrorMessage);
+
+
+const timeInField = offerForm.querySelector('#timein');
+const timeOutField = offerForm.querySelector('#timeout');
+
+const onTimeInChange = () => {
+  timeOutField.value = timeInField.value;
+};
+
+const onTimeOutChange = () => {
+  timeInField.value = timeOutField.value;
+};
+
+timeInField.addEventListener('change', onTimeInChange);
+timeOutField.addEventListener('change', onTimeOutChange);
+
+
 offerForm.addEventListener('submit', (evt) => {
   const isValid = pristine.validate();
   if (!isValid) {
