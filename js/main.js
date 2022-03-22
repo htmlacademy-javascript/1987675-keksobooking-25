@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import {generateMarkup} from './markup-generate.js';
 import {setFormActivity} from './form.js';
+import {map} from './map.js';
 
-generateMarkup();
-setFormActivity(true);
+setFormActivity(false);
+map.on('load', setFormActivity(true));

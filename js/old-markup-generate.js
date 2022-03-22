@@ -1,16 +1,9 @@
 import {createOffers, offerTypeToTitle} from './data.js';
 
-
-// const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
-// const popupElement = cardTemplate.cloneNode(true);
-
-
-/**/
-
-
 const generateMarkup = () => {
   const similarOffers = createOffers();
-  const cardTemplate = document.querySelector('#card');
+  const cardTemplate = document.querySelector('#card').content;
+  const mapCanvas = document.querySelector('#map-canvas');
   const offerElements = [];
 
   similarOffers.forEach((offer) => {
@@ -40,7 +33,7 @@ const generateMarkup = () => {
     offerElements.push(offerElement);
   });
 
-  return offerElements;
+  mapCanvas.appendChild(offerElements[9]);
 };
 
-// export {generateMarkup};
+export {generateMarkup};
