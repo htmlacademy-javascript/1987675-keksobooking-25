@@ -11,6 +11,8 @@ const createMap = () => {
   },
   ).addTo(map);
 
+  const markerGroup = L.layerGroup().addTo(map);
+
 
   const address = document.querySelector('#address');
   address.setAttribute('readonly', '');
@@ -32,13 +34,13 @@ const createMap = () => {
       icon: mainPinIcon,
     },
   );
-  mainPinMarker.addTo(map);
+  mainPinMarker.addTo(markerGroup);
 
   const mainLatLng = Object.values(mainPinMarker.getLatLng())
     .map((element) => element.toFixed(5));
   address.value = mainLatLng;
 
-  mainPinMarker.on('moveend', (evt) => {
+  mainPinMarker.on('move', (evt) => {
     const latLng = Object.values(evt.target.getLatLng())
       .map((element) => element.toFixed(5));
     address.value = Object.values(latLng);
@@ -82,7 +84,8 @@ const createMap = () => {
     iconAnchor: [20, 40],
   });
 
-  similarOffers.forEach((similarOffer) => {
+
+  const createMarker = (similarOffer) => {
     const {lat, lng} = similarOffer.location;
     const marker = L.marker(
       {
@@ -95,8 +98,12 @@ const createMap = () => {
     );
 
     marker
-      .addTo(map)
+      .addTo(markerGroup)
       .bindPopup(createPointPopups(similarOffer));
+  };
+
+  similarOffers.forEach((similarOffer) => {
+    createMarker(similarOffer);
   });
 
   return map;
