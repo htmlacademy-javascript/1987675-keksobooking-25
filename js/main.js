@@ -1,6 +1,9 @@
-/* eslint-disable no-console */
-import {generateMarkup} from './markup-generate.js';
-import {setFormActivity} from './form.js';
+import {validateOfferForm, setFormActivity} from './form.js';
+import {createMap} from './map.js';
 
-generateMarkup();
-setFormActivity(true);
+setFormActivity(false);
+
+const map = createMap();
+map.on('load', setFormActivity(true));
+
+validateOfferForm();
