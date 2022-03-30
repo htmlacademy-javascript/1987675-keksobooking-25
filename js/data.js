@@ -86,4 +86,4 @@ const createOffers = () => {
   return Array.from({length: OFFERS_COUNT}, createOffer);
 };
 
-export {createOffers, offerTypeToTitle};
+// export {createOffers, offerTypeToTitle};
