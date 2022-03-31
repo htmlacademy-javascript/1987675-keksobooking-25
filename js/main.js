@@ -1,9 +1,12 @@
-import {validateOfferForm, setFormActivity} from './form.js';
-import {createMap} from './map.js';
+import { setOfferFormSubmit, setFormActivity } from './form.js';
+import { map, putMarkersOnMap } from './map.js';
+import { getOffersData } from './api.js';
+import { showAlert } from './util.js';
 
 setFormActivity(false);
 
-const map = createMap();
+getOffersData(putMarkersOnMap, showAlert);
+
 map.on('load', setFormActivity(true));
 
-validateOfferForm();
+setOfferFormSubmit();
