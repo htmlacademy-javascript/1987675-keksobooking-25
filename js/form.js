@@ -117,7 +117,9 @@ const setFormActivity = (status) => {
       fieldset.setAttribute('disabled', '');
     });
   }
+};
 
+const setFiltersActivity = (status) => {
   const mapFilters = document.querySelector('.map__filters');
   const mapFiltersFieldsets = Array.from(mapFilters.children);
 
@@ -198,13 +200,16 @@ const setOfferFormSubmit = () => {
 
 
 const resetButton = offerForm.querySelector('.ad-form__reset');
-resetButton.addEventListener('click', (evt) => {
-  evt.preventDefault();
 
-  offerForm.reset();
-  resetMap();
-  resetFilters();
-});
+const setResetButtonClick = (cb) => {
+  resetButton.addEventListener('click', (evt) => {
+    evt.preventDefault();
 
+    offerForm.reset();
+    resetMap();
+    resetFilters();
+    cb();
+  });
+};
 
-export {setOfferFormSubmit, setFormActivity };
+export {setOfferFormSubmit, setFormActivity, setFiltersActivity, setResetButtonClick };

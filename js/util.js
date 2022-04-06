@@ -38,6 +38,11 @@ const getRandomArrayElement = (elements) => {
 };
 
 
+const declinationOfNum = (number, words) => {
+  return words[(number % 100 > 4 && number % 100 < 20) ? 2 : [2, 0, 1, 1, 1, 2][(number % 10 < 5) ? Math.abs(number) % 10 : 5]];
+};
+
+
 const showAlert = (message) => {
   const alertContainer = document.createElement('div');
   alertContainer.style.zIndex = 100;
@@ -73,4 +78,13 @@ const unblockSubmitButton = () => {
 };
 
 
-export {getRandomInteger, getRandomFloat, getRandomArrayElement, showAlert, blockSubmitButton, unblockSubmitButton};
+const debounce = (cb, timeoutDelay) => {
+  let timeoutId;
+  return (...rest) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => cb.apply(this, rest), timeoutDelay);
+  };
+};
+
+
+export { getRandomInteger, getRandomFloat, getRandomArrayElement, showAlert, blockSubmitButton, unblockSubmitButton, debounce, declinationOfNum };
