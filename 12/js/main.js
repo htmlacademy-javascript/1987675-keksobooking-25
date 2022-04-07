@@ -17,6 +17,5 @@ map.on('load', getOffersData((offers) => {
     PUT_MARKERS_DELAY
   ));
   setResetButtonClick(() => putMarkersOnMap(offers));
+  setOfferFormSubmit(() => putMarkersOnMap(offers));
 }, showAlert));
-
-setOfferFormSubmit();

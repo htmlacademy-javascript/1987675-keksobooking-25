@@ -1,6 +1,20 @@
-/* eslint-disable arrow-body-style */
-
 import { declinationOfNum } from './util.js';
+
+const OfferTypeToTitle = {
+  PALACE: 'Дворец',
+  FLAT: 'Квартира',
+  HOUSE: 'Дом',
+  BUNGALOW: 'Бунгало',
+  HOTEL: 'Отель',
+};
+
+const PriceList = {
+  LOW_COST: 10000,
+  HIGH_COST: 50000,
+};
+
+const OFFERS_ON_MAP_NUMBER = 10;
+
 
 const map = L.map('map-canvas').setView({
   lat: 35.681729,
@@ -46,14 +60,6 @@ mainPinMarker.on('move', (evt) => {
   address.value = Object.values(latLng);
 });
 
-const offerTypeToTitle = {
-  palace: 'Дворец',
-  flat: 'Квартира',
-  house: 'Дом',
-  bungalow: 'Бунгало',
-  hotel: 'Отель',
-};
-
 
 const createPointPopups = (similarOffer) => {
   const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
@@ -63,17 +69,11 @@ const createPointPopups = (similarOffer) => {
   offerElement.querySelector('.popup__title').textContent = similarOffer.offer.title;
   offerElement.querySelector('.popup__text--address').textContent = similarOffer.offer.address;
   offerElement.querySelector('.popup__text--price').textContent = `${similarOffer.offer.price} ₽/ночь`;
-  offerElement.querySelector('.popup__type').textContent = offerTypeToTitle[similarOffer.offer.type];
-
-  // offerElement.querySelector('.popup__text--capacity').textContent = `${similarOffer.offer.rooms} комнат
-  //   для ${similarOffer.offer.guests} гостей`;
-
+  offerElement.querySelector('.popup__type').textContent = OfferTypeToTitle[similarOffer.offer.type.toUpperCase()];
   offerElement.querySelector('.popup__text--capacity').textContent = `
     ${similarOffer.offer.rooms} ${declinationOfNum(similarOffer.offer.rooms, ['комната', 'комнаты', 'комнат'])}
     ${similarOffer.offer.guests === 0 ? 'не для гостей' : `для ${similarOffer.offer.guests} ${declinationOfNum(similarOffer.offer.guests, ['гостя', 'гостей', 'гостей'])}`}
     `;
-
-
   offerElement.querySelector('.popup__text--time').textContent = `Заезд после ${similarOffer.offer.checkin}, выезд до ${similarOffer.offer.checkout}`;
   offerElement.querySelector('.popup__features').innerHTML = '';
   if (similarOffer.offer.features) {
@@ -124,27 +124,21 @@ const createMarker = (similarOffer) => {
 };
 
 
-const filterByType = (offer) => {
-  return offer.offer.type === document.querySelector('#housing-type').value || document.querySelector('#housing-type').value === 'any';
-};
+const filterByType = (offer) => offer.offer.type === document.querySelector('#housing-type').value || document.querySelector('#housing-type').value === 'any';
 
 const filterByPrice = (offer) => {
-  if ((offer.offer.price < 10000) && (document.querySelector('#housing-price').value === 'low') ||
-    (offer.offer.price > 10000 && offer.offer.price < 50000) && (document.querySelector('#housing-price').value === 'middle') ||
-    (offer.offer.price > 50000) && (document.querySelector('#housing-price').value === 'high') ||
+  if ((offer.offer.price < PriceList.LOW_COST) && (document.querySelector('#housing-price').value === 'low') ||
+    (offer.offer.price >= PriceList.LOW_COST && offer.offer.price <= PriceList.HIGH_COST) && (document.querySelector('#housing-price').value === 'middle') ||
+    (offer.offer.price > PriceList.HIGH_COST) && (document.querySelector('#housing-price').value === 'high') ||
     document.querySelector('#housing-price').value === 'any') {
     return true;
   }
   return false;
 };
 
-const filterByRooms = (offer) => {
-  return offer.offer.rooms === parseInt(document.querySelector('#housing-rooms').value, 10) || document.querySelector('#housing-rooms').value === 'any';
-};
+const filterByRooms = (offer) => offer.offer.rooms === parseInt(document.querySelector('#housing-rooms').value, 10) || document.querySelector('#housing-rooms').value === 'any';
 
-const filterByGuests = (offer) => {
-  return offer.offer.guests === parseInt(document.querySelector('#housing-guests').value, 10) || document.querySelector('#housing-guests').value === 'any';
-};
+const filterByGuests = (offer) => offer.offer.guests === parseInt(document.querySelector('#housing-guests').value, 10) || document.querySelector('#housing-guests').value === 'any';
 
 const filterByFeatures = (offer) => {
   const checkedFeatures = Array.from(document.querySelectorAll('input[name="features"]:checked'));
@@ -170,7 +164,7 @@ const putMarkersOnMap = (similarOffers) => {
     .filter(filterByRooms)
     .filter(filterByGuests)
     .filter(filterByFeatures)
-    .slice(0, 10)
+    .slice(0, OFFERS_ON_MAP_NUMBER)
     .forEach((similarOffer) => {
       createMarker(similarOffer);
     });
