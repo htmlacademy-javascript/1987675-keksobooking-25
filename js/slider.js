@@ -1,5 +1,3 @@
-/* eslint-disable arrow-body-style */
-
 const createSlider = () => {
   const sliderPrice = document.querySelector('.ad-form__slider');
   const priceField = document.querySelector('#price');
@@ -13,12 +11,8 @@ const createSlider = () => {
     step: 1,
     connect: 'lower',
     format: {
-      to: (value) => {
-        return value.toFixed(0);
-      },
-      from: (value) => {
-        return parseFloat(value);
-      },
+      to: (value) => value.toFixed(0),
+      from: (value) => parseFloat(value),
     },
   });
 

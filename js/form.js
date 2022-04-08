@@ -1,9 +1,23 @@
-/* eslint-disable arrow-body-style */
-
 import { resetFilters, resetMap } from './map.js';
 import { sendOfferData } from './api.js';
 import { createSlider } from './slider.js';
 import { blockSubmitButton, showAlert, unblockSubmitButton } from './util.js';
+
+
+const RoomNumberOption = {
+  1: '1',
+  2: ['1', '2'],
+  3: ['1', '2', '3'],
+  100: '0',
+};
+
+const TypeOption = {
+  BUNGALOW: 0,
+  FLAT: 1000,
+  HOTEL: 3000,
+  HOUSE: 5000,
+  PALACE: 10000,
+};
 
 
 const offerForm = document.querySelector('.ad-form');
@@ -22,24 +36,14 @@ const pristine = new Pristine(offerForm, {
 const roomNumberField = offerForm.querySelector('#room_number');
 const capacityField = offerForm.querySelector('#capacity');
 
-const roomNumberOption = {
-  '1': '1',
-  '2': ['1', '2'],
-  '3': ['1', '2', '3'],
-  '100': '0',
-};
 
-const validateCapacity = () => {
-  return roomNumberOption[roomNumberField.value].includes(capacityField.value);
-};
+const validateCapacity = () => RoomNumberOption[roomNumberField.value].includes(capacityField.value);
 
-const getCapacityErrorMessage = () => {
-  return `
+const getCapacityErrorMessage = () => `
     ${roomNumberField.options[roomNumberField.selectedIndex].textContent}
     не подходит
     ${capacityField.options[capacityField.selectedIndex].textContent}
   `;
-};
 
 pristine.addValidator(capacityField, validateCapacity, getCapacityErrorMessage);
 
@@ -53,29 +57,17 @@ roomNumberField.addEventListener('change', onRoomNumberChange);
 const typeField = offerForm.querySelector('#type');
 const priceField = offerForm.querySelector('#price');
 
-const typeOption = {
-  'bungalow': '0',
-  'flat': '1000',
-  'hotel': '3000',
-  'house': '5000',
-  'palace': '10000',
-};
-
 const onTypeChange = () => {
-  priceField.min = typeOption[typeField.value];
-  priceField.placeholder = typeOption[typeField.value];
+  priceField.min = TypeOption[typeField.value];
+  priceField.placeholder = TypeOption[typeField.value];
   pristine.validate(priceField);
 };
 
 typeField.addEventListener('change', onTypeChange);
 
-const validatePrice = () => {
-  return priceField.value >= +typeOption[typeField.value];
-};
+const validatePrice = () => priceField.value >= TypeOption[typeField.value.toUpperCase()];
 
-const getPriceErrorMessage = () => {
-  return `Минимальная цена для выбранного типа жилья ${typeOption[typeField.value]} ₽/ночь`;
-};
+const getPriceErrorMessage = () => `Минимальная цена для выбранного типа жилья ${TypeOption[typeField.value.toUpperCase()]} ₽/ночь`;
 
 pristine.addValidator(priceField, validatePrice, getPriceErrorMessage);
 
@@ -117,7 +109,9 @@ const setFormActivity = (status) => {
       fieldset.setAttribute('disabled', '');
     });
   }
+};
 
+const setFiltersActivity = (status) => {
   const mapFilters = document.querySelector('.map__filters');
   const mapFiltersFieldsets = Array.from(mapFilters.children);
 
@@ -169,7 +163,7 @@ const showErrorSendMessage = () => {
 };
 
 
-const setOfferFormSubmit = () => {
+const setOfferFormSubmit = (cb) => {
   offerForm.addEventListener('submit', (evt) => {
     evt.preventDefault();
 
@@ -184,6 +178,7 @@ const setOfferFormSubmit = () => {
           offerForm.reset();
           resetMap();
           resetFilters();
+          cb();
         },
         () => {
           unblockSubmitButton();
@@ -198,13 +193,16 @@ const setOfferFormSubmit = () => {
 
 
 const resetButton = offerForm.querySelector('.ad-form__reset');
-resetButton.addEventListener('click', (evt) => {
-  evt.preventDefault();
 
-  offerForm.reset();
-  resetMap();
-  resetFilters();
-});
+const setResetButtonClick = (cb) => {
+  resetButton.addEventListener('click', (evt) => {
+    evt.preventDefault();
 
+    offerForm.reset();
+    resetMap();
+    resetFilters();
+    cb();
+  });
+};
 
-export {setOfferFormSubmit, setFormActivity };
+export {setOfferFormSubmit, setFormActivity, setFiltersActivity, setResetButtonClick };

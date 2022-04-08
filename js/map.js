@@ -1,3 +1,21 @@
+import { declinationOfNum } from './util.js';
+
+const OfferTypeToTitle = {
+  PALACE: 'Дворец',
+  FLAT: 'Квартира',
+  HOUSE: 'Дом',
+  BUNGALOW: 'Бунгало',
+  HOTEL: 'Отель',
+};
+
+const PriceList = {
+  LOW_COST: 10000,
+  HIGH_COST: 50000,
+};
+
+const OFFERS_ON_MAP_NUMBER = 10;
+
+
 const map = L.map('map-canvas').setView({
   lat: 35.681729,
   lng: 139.753927,
@@ -8,7 +26,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 },
 ).addTo(map);
 
-const markerGroup = L.layerGroup().addTo(map);
+const mainMarkerGroup = L.layerGroup().addTo(map);
+const offersMarkerGroup = L.layerGroup().addTo(map);
 
 const address = document.querySelector('#address');
 address.setAttribute('readonly', '');
@@ -29,7 +48,7 @@ const mainPinMarker = L.marker(
     icon: mainPinIcon,
   },
 )
-  .addTo(markerGroup);
+  .addTo(mainMarkerGroup);
 
 const mainLatLng = Object.values(mainPinMarker.getLatLng())
   .map((element) => element.toFixed(5));
@@ -41,14 +60,6 @@ mainPinMarker.on('move', (evt) => {
   address.value = Object.values(latLng);
 });
 
-const offerTypeToTitle = {
-  palace: 'Дворец',
-  flat: 'Квартира',
-  house: 'Дом',
-  bungalow: 'Бунгало',
-  hotel: 'Отель',
-};
-
 
 const createPointPopups = (similarOffer) => {
   const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
@@ -58,8 +69,11 @@ const createPointPopups = (similarOffer) => {
   offerElement.querySelector('.popup__title').textContent = similarOffer.offer.title;
   offerElement.querySelector('.popup__text--address').textContent = similarOffer.offer.address;
   offerElement.querySelector('.popup__text--price').textContent = `${similarOffer.offer.price} ₽/ночь`;
-  offerElement.querySelector('.popup__type').textContent = offerTypeToTitle[similarOffer.offer.type];
-  offerElement.querySelector('.popup__text--capacity').textContent = `${similarOffer.offer.rooms} комнаты для ${similarOffer.offer.guests} гостей`;
+  offerElement.querySelector('.popup__type').textContent = OfferTypeToTitle[similarOffer.offer.type.toUpperCase()];
+  offerElement.querySelector('.popup__text--capacity').textContent = `
+    ${similarOffer.offer.rooms} ${declinationOfNum(similarOffer.offer.rooms, ['комната', 'комнаты', 'комнат'])}
+    ${similarOffer.offer.guests === 0 ? 'не для гостей' : `для ${similarOffer.offer.guests} ${declinationOfNum(similarOffer.offer.guests, ['гостя', 'гостей', 'гостей'])}`}
+    `;
   offerElement.querySelector('.popup__text--time').textContent = `Заезд после ${similarOffer.offer.checkin}, выезд до ${similarOffer.offer.checkout}`;
   offerElement.querySelector('.popup__features').innerHTML = '';
   if (similarOffer.offer.features) {
@@ -105,15 +119,55 @@ const createMarker = (similarOffer) => {
   );
 
   marker
-    .addTo(markerGroup)
+    .addTo(offersMarkerGroup)
     .bindPopup(createPointPopups(similarOffer));
 };
 
 
+const filterByType = (offer) => offer.offer.type === document.querySelector('#housing-type').value || document.querySelector('#housing-type').value === 'any';
+
+const filterByPrice = (offer) => {
+  if ((offer.offer.price < PriceList.LOW_COST) && (document.querySelector('#housing-price').value === 'low') ||
+    (offer.offer.price >= PriceList.LOW_COST && offer.offer.price <= PriceList.HIGH_COST) && (document.querySelector('#housing-price').value === 'middle') ||
+    (offer.offer.price > PriceList.HIGH_COST) && (document.querySelector('#housing-price').value === 'high') ||
+    document.querySelector('#housing-price').value === 'any') {
+    return true;
+  }
+  return false;
+};
+
+const filterByRooms = (offer) => offer.offer.rooms === parseInt(document.querySelector('#housing-rooms').value, 10) || document.querySelector('#housing-rooms').value === 'any';
+
+const filterByGuests = (offer) => offer.offer.guests === parseInt(document.querySelector('#housing-guests').value, 10) || document.querySelector('#housing-guests').value === 'any';
+
+const filterByFeatures = (offer) => {
+  const checkedFeatures = Array.from(document.querySelectorAll('input[name="features"]:checked'));
+
+  if (!checkedFeatures.length) {
+    return true;
+  }
+
+  if (offer.offer.features) {
+    return checkedFeatures.every((checkedFeature) => offer.offer.features.includes(checkedFeature.value));
+  }
+
+  return false;
+};
+
+
 const putMarkersOnMap = (similarOffers) => {
-  similarOffers.forEach((similarOffer) => {
-    createMarker(similarOffer);
-  });
+  offersMarkerGroup.clearLayers();
+  similarOffers
+    .slice()
+    .filter(filterByType)
+    .filter(filterByPrice)
+    .filter(filterByRooms)
+    .filter(filterByGuests)
+    .filter(filterByFeatures)
+    .slice(0, OFFERS_ON_MAP_NUMBER)
+    .forEach((similarOffer) => {
+      createMarker(similarOffer);
+    });
 };
 
 
@@ -122,20 +176,27 @@ const resetMap = () => {
     lat: 35.681729,
     lng: 139.753927,
   });
-
   map.setView({
     lat: 35.681729,
     lng: 139.753927,
-  });
+  }, 13);
 
   map.closePopup();
 };
 
 
 const mapFilters = document.querySelector('.map__filters');
+
 const resetFilters = () => {
   mapFilters.reset();
 };
 
 
-export {map, putMarkersOnMap, resetMap, resetFilters};
+const setFiltersChange = (cb) => {
+  mapFilters.addEventListener('change', () => {
+    cb();
+  });
+};
+
+
+export {map, putMarkersOnMap, resetMap, resetFilters, setFiltersChange };

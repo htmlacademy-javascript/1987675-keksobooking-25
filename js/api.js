@@ -3,9 +3,8 @@ const getOffersData = (onSuccess, onFail) => {
     .then((response) => {
       if (response.ok) {
         return response.json();
-      } else {
-        throw new Error;
       }
+      throw new Error;
     })
     .then((offers) => {
       onSuccess(offers);
