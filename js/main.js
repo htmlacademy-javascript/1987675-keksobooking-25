@@ -2,6 +2,8 @@ import { setOfferFormSubmit, setFormActivity, setFiltersActivity, setResetButton
 import { map, putMarkersOnMap, setFiltersChange } from './map.js';
 import { getOffersData } from './api.js';
 import { debounce, showAlert } from './util.js';
+import { setAvatarUpload, setOfferPhotoUpload } from './image-upload.js';
+
 
 const PUT_MARKERS_DELAY = 500;
 
@@ -19,3 +21,6 @@ map.on('load', getOffersData((offers) => {
   setResetButtonClick(() => putMarkersOnMap(offers));
   setOfferFormSubmit(() => putMarkersOnMap(offers));
 }, showAlert));
+
+setAvatarUpload();
+setOfferPhotoUpload();
