@@ -32,4 +32,13 @@ const setOfferPhotoUpload = () => {
   });
 };
 
-export { setAvatarUpload, setOfferPhotoUpload };
+const resetPreviews = () => {
+  const avatarPreview = document.querySelector('.ad-form-header__preview img');
+  avatarPreview.src = 'img/muffin-grey.svg';
+
+  const offerPhotoPreviewContainer = document.querySelector('.ad-form__photo');
+  offerPhotoPreviewContainer.innerHTML = '';
+};
+
+
+export { setAvatarUpload, setOfferPhotoUpload, resetPreviews };

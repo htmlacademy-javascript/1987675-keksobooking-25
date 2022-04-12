@@ -6,11 +6,11 @@ const declinationOfNum = (number, words) => words[(number % 100 > 4 && number % 
 
 const showAlert = (message) => {
   const alertContainer = document.createElement('div');
-  alertContainer.style.zIndex = 100;
+  alertContainer.style.zIndex = '100';
   alertContainer.style.position = 'fixed';
-  alertContainer.style.left = 0;
-  alertContainer.style.top = 0;
-  alertContainer.style.right = 0;
+  alertContainer.style.left = '0px';
+  alertContainer.style.top = '0px';
+  alertContainer.style.right = '0px';
   alertContainer.style.padding = '5px 3px';
   alertContainer.style.fontSize = '24px';
   alertContainer.style.textAlign = 'center';

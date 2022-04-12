@@ -13,13 +13,19 @@ const PriceList = {
   HIGH_COST: 50000,
 };
 
+const MainAddress = {
+  LAT: 35.681729,
+  LNG: 139.753927,
+  ZOOM: 13,
+};
+
 const OFFERS_ON_MAP_NUMBER = 10;
 
 
 const map = L.map('map-canvas').setView({
-  lat: 35.681729,
-  lng: 139.753927,
-}, 13);
+  lat: MainAddress.LAT,
+  lng: MainAddress.LNG,
+}, MainAddress.ZOOM);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -40,8 +46,8 @@ const mainPinIcon = L.icon({
 
 const mainPinMarker = L.marker(
   {
-    lat: 35.681729,
-    lng: 139.753927,
+    lat: MainAddress.LAT,
+    lng: MainAddress.LNG,
   },
   {
     draggable: true,
@@ -61,8 +67,9 @@ mainPinMarker.on('move', (evt) => {
 });
 
 
-const createPointPopups = (similarOffer) => {
-  const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
+const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
+
+const createPointPopup = (similarOffer) => {
   const offerElement = cardTemplate.cloneNode(true);
 
   offerElement.querySelector('.popup__avatar').setAttribute('src', similarOffer.author.avatar);
@@ -78,21 +85,34 @@ const createPointPopups = (similarOffer) => {
   offerElement.querySelector('.popup__features').innerHTML = '';
   if (similarOffer.offer.features) {
     similarOffer.offer.features.forEach((feature) => {
-      offerElement.querySelector('.popup__features').innerHTML += `<li class="popup__feature popup__feature--${feature}"></li>`;
+      const addedFeature = document.createElement('li');
+      addedFeature.classList.add('popup__feature', `popup__feature--${feature}`);
+      offerElement.querySelector('.popup__features').appendChild(addedFeature);
     });
+  } else {
+    offerElement.querySelector('.popup__features').remove();
   }
 
   offerElement.querySelector('.popup__description').innerHTML = '';
   if (similarOffer.offer.description) {
     offerElement.querySelector('.popup__description').textContent = similarOffer.offer.description;
+  } else {
+    offerElement.querySelector('.popup__description').remove();
   }
 
   offerElement.querySelector('.popup__photos').innerHTML = '';
   if (similarOffer.offer.photos) {
     similarOffer.offer.photos.forEach((photo) => {
-      offerElement.querySelector('.popup__photos')
-        .innerHTML += `<img src="${photo}" class="popup__photo" width="45" height="40" alt="Фотография жилья"></img>`;
+      const addedPhoto = document.createElement('img');
+      addedPhoto.src = photo;
+      addedPhoto.classList.add('popup__photo');
+      addedPhoto.width = '45';
+      addedPhoto.height = '40';
+      addedPhoto.alt = 'Фотография жилья';
+      offerElement.querySelector('.popup__photos').appendChild(addedPhoto);
     });
+  } else {
+    offerElement.querySelector('.popup__photos').remove();
   }
 
   return offerElement;
@@ -120,37 +140,30 @@ const createMarker = (similarOffer) => {
 
   marker
     .addTo(offersMarkerGroup)
-    .bindPopup(createPointPopups(similarOffer));
+    .bindPopup(createPointPopup(similarOffer));
 };
 
 
-const filterByType = (offer) => offer.offer.type === document.querySelector('#housing-type').value || document.querySelector('#housing-type').value === 'any';
-
-const filterByPrice = (offer) => {
-  if ((offer.offer.price < PriceList.LOW_COST) && (document.querySelector('#housing-price').value === 'low') ||
-    (offer.offer.price >= PriceList.LOW_COST && offer.offer.price <= PriceList.HIGH_COST) && (document.querySelector('#housing-price').value === 'middle') ||
-    (offer.offer.price > PriceList.HIGH_COST) && (document.querySelector('#housing-price').value === 'high') ||
-    document.querySelector('#housing-price').value === 'any') {
-    return true;
-  }
-  return false;
-};
-
-const filterByRooms = (offer) => offer.offer.rooms === parseInt(document.querySelector('#housing-rooms').value, 10) || document.querySelector('#housing-rooms').value === 'any';
-
-const filterByGuests = (offer) => offer.offer.guests === parseInt(document.querySelector('#housing-guests').value, 10) || document.querySelector('#housing-guests').value === 'any';
-
-const filterByFeatures = (offer) => {
+const filters = (offer) => {
   const checkedFeatures = Array.from(document.querySelectorAll('input[name="features"]:checked'));
 
-  if (!checkedFeatures.length) {
+  if (
+    (offer.offer.type === document.querySelector('#housing-type').value || document.querySelector('#housing-type').value === 'any') &&
+
+    ((offer.offer.price < PriceList.LOW_COST) && (document.querySelector('#housing-price').value === 'low') ||
+      (offer.offer.price >= PriceList.LOW_COST && offer.offer.price <= PriceList.HIGH_COST) && (document.querySelector('#housing-price').value === 'middle') ||
+      (offer.offer.price > PriceList.HIGH_COST) && (document.querySelector('#housing-price').value === 'high') ||
+      document.querySelector('#housing-price').value === 'any') &&
+
+    (offer.offer.rooms === parseInt(document.querySelector('#housing-rooms').value, 10) || document.querySelector('#housing-rooms').value === 'any') &&
+
+    (offer.offer.guests === parseInt(document.querySelector('#housing-guests').value, 10) || document.querySelector('#housing-guests').value === 'any') &&
+
+    ((!checkedFeatures.length) ||
+      (offer.offer.features) && checkedFeatures.every((checkedFeature) => offer.offer.features.includes(checkedFeature.value)))
+  ) {
     return true;
   }
-
-  if (offer.offer.features) {
-    return checkedFeatures.every((checkedFeature) => offer.offer.features.includes(checkedFeature.value));
-  }
-
   return false;
 };
 
@@ -158,12 +171,7 @@ const filterByFeatures = (offer) => {
 const putMarkersOnMap = (similarOffers) => {
   offersMarkerGroup.clearLayers();
   similarOffers
-    .slice()
-    .filter(filterByType)
-    .filter(filterByPrice)
-    .filter(filterByRooms)
-    .filter(filterByGuests)
-    .filter(filterByFeatures)
+    .filter(filters)
     .slice(0, OFFERS_ON_MAP_NUMBER)
     .forEach((similarOffer) => {
       createMarker(similarOffer);
@@ -173,13 +181,13 @@ const putMarkersOnMap = (similarOffers) => {
 
 const resetMap = () => {
   mainPinMarker.setLatLng({
-    lat: 35.681729,
-    lng: 139.753927,
+    lat: MainAddress.LAT,
+    lng: MainAddress.LNG,
   });
   map.setView({
-    lat: 35.681729,
-    lng: 139.753927,
-  }, 13);
+    lat: MainAddress.LAT,
+    lng: MainAddress.LNG,
+  }, MainAddress.ZOOM);
 
   map.closePopup();
 };
