@@ -2,6 +2,7 @@ import { resetFilters, resetMap } from './map.js';
 import { sendOfferData } from './api.js';
 import { createSlider } from './slider.js';
 import { blockSubmitButton, showAlert, unblockSubmitButton } from './util.js';
+import { resetPreviews } from './image-upload.js';
 
 
 const RoomNumberOption = {
@@ -129,20 +130,27 @@ const setFiltersActivity = (status) => {
 };
 
 
+const successTemplate = document.querySelector('#success').content.querySelector('.success');
+const successMessage = successTemplate.cloneNode(true);
+
+const onSuccessMessageEscape = (evt) => {
+  if (evt.key === 'Escape') {
+    successMessage.remove();
+    document.removeEventListener('click', onSuccesMessageClick);
+  }
+};
+
+function onSuccesMessageClick () {
+  successMessage.remove();
+  document.removeEventListener('keydown', onSuccessMessageEscape);
+}
+
 const showSuccessSendMessage = () => {
-  const successTemplate = document.querySelector('#success').content.querySelector('.success');
-  const successMessage = successTemplate.cloneNode(true);
   document.body.appendChild(successMessage);
 
-  document.addEventListener('keydown', (evt) => {
-    if (evt.key === 'Escape') {
-      successMessage.remove();
-    }
-  });
+  document.addEventListener('keydown', onSuccessMessageEscape, {once: true});
 
-  document.addEventListener('click', () => {
-    successMessage.remove();
-  });
+  document.addEventListener('click', onSuccesMessageClick, {once: true});
 };
 
 
@@ -178,6 +186,7 @@ const setOfferFormSubmit = (cb) => {
           offerForm.reset();
           resetMap();
           resetFilters();
+          resetPreviews();
           cb();
         },
         () => {
@@ -201,6 +210,7 @@ const setResetButtonClick = (cb) => {
     offerForm.reset();
     resetMap();
     resetFilters();
+    resetPreviews();
     cb();
   });
 };
